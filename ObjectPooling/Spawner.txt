@@ -1,0 +1,78 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Spawner : MonoBehaviour {
+    
+    [SerializeField]
+    private bool m_on = false;
+
+    [SerializeField]
+    Enums.Enemies m_enemyType;
+
+    private Pool _pool;
+    private GameObject _tempEnemy;
+    private float _timeSinceSpawn;
+    private const int _SPAWNINTERVAL = 8;
+
+    //------------------------------------------------------------------------------------------------------------//
+
+    void Awake()
+    {
+        _timeSinceSpawn = _SPAWNINTERVAL;               
+    }
+
+    //------------------------------------------------------------------------------------------------------------//
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (m_on)
+        {
+            _timeSinceSpawn += Time.deltaTime;
+            if (_timeSinceSpawn >= _SPAWNINTERVAL)
+            {
+                SpawnEnemy();
+            }
+        }
+    }
+
+    //------------------------------------------------------------------------------------------------------------//
+
+    void SpawnEnemy()
+    {        
+        _tempEnemy = _pool.GetComponent<Pool>().GetEnemy();
+        if (_tempEnemy != null)
+        {
+            _tempEnemy.transform.position = transform.position;
+            _tempEnemy.GetComponent<Rigidbody>().useGravity = true;
+            _tempEnemy.SetActive(true);
+            _tempEnemy.GetComponent<Enemy>().ActivateColliders();
+            _tempEnemy.GetComponent<UnityEngine.AI.NavMeshAgent>().enabled = true;     
+        }
+        _timeSinceSpawn = 0;
+    }
+
+    //------------------------------------------------------------------------------------------------------------//
+
+    //Gets called by the gamecontroller when the game is over to stop enemies from spawning
+    public void DeactivateSpawner()
+    {
+        m_on = false;
+    }
+
+    //------------------------------------------------------------------------------------------------------------//
+
+    //Gets called by the corresponding pool once the instantiation is done.
+    public void ActivateSpawner(Pool newPool)
+    {
+        _pool = newPool;
+        if (newPool.GetEnemyType() == m_enemyType)
+        {
+            print("turning on " + m_enemyType + " pool");
+            m_on = true;
+        }
+    }
+
+    //------------------------------------------------------------------------------------------------------------//
+}

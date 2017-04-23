@@ -1,0 +1,62 @@
+using UnityEngine;
+using System.Collections;
+
+public class WitchEnemy : Enemy {
+
+    [SerializeField]
+    GameObject witchPool;
+
+    const int WITCHMAXHP = 50;
+   
+    const int TIMEUNTILRETURNINGTOPOOL = 10;
+
+	//------------------------------------------------------------------------------------------------------------//
+	
+    void Awake () 
+    {       
+		//Inherited from Enemy class
+        _dead = false;		
+        _gameOver = false;
+        damageOutput = GetComponentInChildren<DamageOutput>();
+        nav = GetComponent<UnityEngine.AI.NavMeshAgent>();
+        anim = GetComponent<Animator>();
+        _walkSpeed = nav.speed;
+        _health = WITCHMAXHP;
+		//Inherited from Enemy class
+    } 
+
+	//------------------------------------------------------------------------------------------------------------//
+
+    void Update ()
+    {    
+        //If the npc died, but the game is not over yet
+        if (_dead && !_gameOver)
+        {            
+            StopChase();
+            timePassed += Time.deltaTime;
+            if(timePassed >= TIMEUNTILRETURNINGTOPOOL)
+            {                
+                ReturnWitchToPool();
+            }
+        }        
+    }	
+
+	//------------------------------------------------------------------------------------------------------------//
+
+    void ReturnWitchToPool()
+    {        
+        GetComponent<Rigidbody>().useGravity = false;
+        _dead = false;
+        _limbInjured = false;
+        _health = WITCHMAXHP;
+        timePassed = 0;
+        gameObject.SetActive(false);
+        witchPool.GetComponent<Pool>().AddToPool(gameObject);
+        print("Witch returned");
+    }
+	
+	//------------------------------------------------------------------------------------------------------------//
+}
+
+
+

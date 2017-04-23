@@ -1,0 +1,91 @@
+using UnityEngine;
+using System.Collections;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+using System.Collections.Generic;
+
+public class GameController : MonoBehaviour {
+
+    public static event System.Action RoundEnd;
+    
+	//ScriptableObject
+	[SerializeField]
+    private LevelData[] m_levelData;
+	
+    [SerializeField]
+    private Spawner m_witchSpawner;
+
+    [SerializeField]
+    private Spawner m_bruteSpawner;
+
+    [SerializeField]
+    private Spawner m_stalkerSpawner;
+
+    [SerializeField]
+    private Pool m_witchPool;
+
+    [SerializeField]
+    private Pool m_brutepool;
+
+    [SerializeField]
+    private Pool m_stalkerPool;
+	
+	private int _witchesToKill;
+    private int _brutesToKill;
+    private int _stalkersToKill;
+	
+	static private int _round = 0;
+	
+	//------------------------------------------------------------------------------------------------------------//
+	
+	private void Start()
+    {         
+		_witchesToKill = m_levelData[_round].witches;
+        _brutesToKill = m_levelData[_round].brutes;
+        _stalkersToKill = m_levelData[_round].stalkers;
+        InstantiateEnemies();    
+		Cursor.lockState = CursorLockMode.Locked;      		
+    }
+	
+	//------------------------------------------------------------------------------------------------------------//
+	
+	private void InstantiateEnemies()
+    {
+        print("Enemies to kill: witches: " + _witchesToKill + " brutes to kill: " + _brutesToKill + " stalkers to kill: " + _stalkersToKill);
+        m_witchPool.GetComponent<Pool>().InstantiatePool(_witchesToKill);
+        m_brutepool.GetComponent<Pool>().InstantiatePool(_brutesToKill);
+        m_stalkerPool.GetComponent<Pool>().InstantiatePool(_stalkersToKill);
+    }
+	
+	//------------------------------------------------------------------------------------------------------------//
+	
+	public void SetGameIsOver()
+    {        
+        if (RoundEnd != null)
+        {
+		    //Action that messages other classes
+            RoundEnd();
+			RoundOver();
+        }                
+    }
+	
+	//------------------------------------------------------------------------------------------------------------//
+	
+	void RoundOver()
+    {
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.Confined;                
+        DisableEnemySpawners();              
+    }
+	
+	//------------------------------------------------------------------------------------------------------------//
+	
+	void DisableEnemySpawners()
+    {
+        m_witchSpawner.GetComponent<Spawner>().DeactivateSpawner();
+        m_bruteSpawner.GetComponent<Spawner>().DeactivateSpawner();
+        m_stalkerSpawner.GetComponent<Spawner>().DeactivateSpawner();
+    }
+	
+	//------------------------------------------------------------------------------------------------------------//	
+}

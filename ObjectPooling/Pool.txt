@@ -1,0 +1,91 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Pool : MonoBehaviour {
+
+    [SerializeField]
+    private GameObject m_enemy;
+
+    [SerializeField]
+    private Enums.Enemies m_enemyType;
+
+    [SerializeField]
+    private Spawner m_spawner;
+
+    GameObject _tempEnemy;
+    private const int _MAXNUMBEROFENEMIES = 25;
+
+    [SerializeField]
+    List<GameObject> m_poolList;
+
+    //------------------------------------------------------------------------------------------------------------//
+
+    //Gets an enemy out of the list if the pool is not empty
+    public GameObject GetEnemy()
+    {        
+        if (m_poolList.Count != 0)
+        {
+            _tempEnemy = m_poolList[0];
+            m_poolList.RemoveAt(0);
+            return _tempEnemy;
+        }
+        else
+        {
+            return null;
+        }
+
+    }
+
+    //------------------------------------------------------------------------------------------------------------//
+
+    //Returns an enemy to the pool
+    public void AddToPool(GameObject newEnemy)
+    {
+        newEnemy.transform.position = transform.position;
+        m_poolList.Add(newEnemy);
+    }
+
+    //------------------------------------------------------------------------------------------------------------//
+
+    //Called at the start of the game
+    //Instantiates the amount and type of enemy entered in the editor
+    public void InstantiatePool(int numberOfEnemiesToSpawn)
+    {
+        if (numberOfEnemiesToSpawn > 0)
+        {           
+            print("starting to spawn: " + numberOfEnemiesToSpawn);
+            for (int i = 0; i < numberOfEnemiesToSpawn; i++)
+            {
+                m_poolList.Add(Instantiate(m_enemy, transform.position, transform.rotation) as GameObject);
+                m_poolList[i].GetComponent<Rigidbody>().useGravity = false;
+                m_poolList[i].SetActive(false);
+            }
+            print("The " + m_enemyType + " list size: " + m_poolList.Count);
+              
+            if (m_enemy.name.Contains("Witch"))
+            {
+                m_spawner.ActivateSpawner(this);
+            }
+
+            else if(m_enemy.name.Contains("Brute"))
+            {
+                m_spawner.ActivateSpawner(this);
+            }
+
+            else if (m_enemy.name.Contains("Stalker"))
+            {
+                m_spawner.ActivateSpawner(this);
+            }            
+        }
+    }
+
+    //------------------------------------------------------------------------------------------------------------//
+
+    public Enums.Enemies GetEnemyType()
+    {
+        return m_enemyType;
+    }
+
+    //------------------------------------------------------------------------------------------------------------//
+}
